@@ -1,0 +1,43 @@
+package kr.kakaotech.community.exception;
+
+import kr.kakaotech.community.entity.Post;
+import lombok.Getter;
+import org.springframework.http.HttpStatus;
+
+@Getter
+public enum ErrorCode {
+
+    /**
+     * USER 에러
+     */
+    DUPLICATED_EMAIL("이미 사용중인 이메일입니다.", HttpStatus.CONFLICT),
+    DUPLICATED_NICKNAME("이미 사용중인 닉네임입니다.", HttpStatus.CONFLICT),
+
+    NOT_FOUND_USER("사용자를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
+
+    /**
+     * Post 에러
+     */
+    NOT_FOUND_POST("존재하지 않는 게시글입니다.", HttpStatus.NOT_FOUND),
+
+    /**
+     * Comment 에러
+     */
+    NOT_FOUND_COMMENT("존재하지 않는 댓글입니다.", HttpStatus.NOT_FOUND),
+    BAD_REQUEST_COMMENT("이미 삭제된 댓글입니다.", HttpStatus.BAD_REQUEST),
+
+    /**
+     * 권한 에러
+     */
+    FORBIDDEN("권한이 없습니다.", HttpStatus.FORBIDDEN),
+    UNAUTHORIZED("접근할 수 없습니다.", HttpStatus.UNAUTHORIZED),
+    BAD_REQUEST("잘못된 요청입니다.", HttpStatus.BAD_REQUEST);
+
+    private final String message;
+    private final HttpStatus status;
+
+    ErrorCode(String message, HttpStatus status) {
+        this.message = message;
+        this.status = status;
+    }
+}
