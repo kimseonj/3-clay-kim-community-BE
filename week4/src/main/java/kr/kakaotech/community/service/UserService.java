@@ -21,6 +21,7 @@ import java.util.UUID;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     /**
      * 회원가입
@@ -40,7 +41,13 @@ public class UserService {
 
         // 이미지 저장
         Image image = new Image(registerRequest.getUrl());
-        User user = User.toEntity(registerRequest, image);
+        User user = new User(
+                registerRequest.getEmail(),
+                passwordEncoder.encode(registerRequest.getPassword()),
+                registerRequest.getNickname(),
+                registerRequest.getRole(),
+                image
+        );
 
         userRepository.save(user);
     }
