@@ -27,6 +27,17 @@ public enum ErrorCode {
     BAD_REQUEST_COMMENT("이미 삭제된 댓글입니다.", HttpStatus.BAD_REQUEST),
 
     /**
+     * Auth 에러
+     */
+    INVALID_LOGIN_JSON("적절하지 않은 로그인 요청입니다. login email, password 요청을 보내주세요.", HttpStatus.BAD_REQUEST),
+    LOGIN_FAIL("로그인 실패", HttpStatus.UNAUTHORIZED),
+
+    /**
+     * ERROR
+     */
+    INTERNAL_SERVER_ERROR("INTERNAL_SERVER_ERROR", HttpStatus.INTERNAL_SERVER_ERROR),
+
+    /**
      * 권한 에러
      */
     FORBIDDEN("권한이 없습니다.", HttpStatus.FORBIDDEN),
