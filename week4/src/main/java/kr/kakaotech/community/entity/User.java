@@ -3,18 +3,19 @@ package kr.kakaotech.community.entity;
 import jakarta.persistence.*;
 import kr.kakaotech.community.dto.request.UserRegisterRequest;
 import kr.kakaotech.community.dto.request.UserUpdateRequest;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
-import java.awt.*;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+@Builder
 @Getter
-@Setter
+@AllArgsConstructor
 @Entity(name = "users")
 public class User {
     @Id

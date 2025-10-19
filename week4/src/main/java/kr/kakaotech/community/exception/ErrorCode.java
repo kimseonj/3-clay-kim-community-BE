@@ -38,6 +38,11 @@ public enum ErrorCode {
     INTERNAL_SERVER_ERROR("INTERNAL_SERVER_ERROR", HttpStatus.INTERNAL_SERVER_ERROR),
 
     /**
+     * JWT
+     */
+    EXPIRED_JWT("JWT 기간 만료되었습니다.", HttpStatus.UNAUTHORIZED),
+
+    /**
      * 권한 에러
      */
     FORBIDDEN("권한이 없습니다.", HttpStatus.FORBIDDEN),
