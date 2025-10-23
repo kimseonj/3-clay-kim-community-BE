@@ -50,6 +50,8 @@ async function fetchPosts(cursor = null) {
     }
   });
 
+  // const statusResponse = await fetch(`${API_BASE_URL}/posts/statuses`)
+
   if (!response.ok) {
     throw new Error('게시글을 불러오는데 실패했습니다.');
   }
@@ -130,7 +132,7 @@ function appendPosts(posts) {
     
     // 클릭 이벤트 등록
     postItem.addEventListener('click', () => {
-      window.location.href = `/pages/post/detail.html?id=${post.id}`;
+      window.location.href = `/pages/post/postDetail.html?id=${post.id}`;
     });
     
     postList.appendChild(postItem);

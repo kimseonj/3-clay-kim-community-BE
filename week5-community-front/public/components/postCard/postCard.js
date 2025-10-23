@@ -2,6 +2,7 @@
 
 // 게시글 카드 생성
 function createPostCard(post) {
+  console.log(post);
   return `
     <div class="post-item" data-post-id="${post.id}">
       <div class="post-item-header">
@@ -13,16 +14,16 @@ function createPostCard(post) {
       
       <div class="post-item-meta">
         <div class="post-meta-item">
-          <span class="icon">👁️</span>
-          <span>${post.views || 0}</span>
+          <span class="icon">조회수</span>
+          <span>${post.viewCount || 0}</span>
         </div>
         <div class="post-meta-item">
-          <span class="icon">❤️</span>
-          <span>${post.likes || 0}</span>
+          <span class="icon">좋아요</span>
+          <span>${post.likeCount || 0}</span>
         </div>
         <div class="post-meta-item">
-          <span class="icon">💬</span>
-          <span>${post.comments || 0}</span>
+          <span class="icon">댓글</span>
+          <span>${post.commentCount || 0}</span>
         </div>
         <div class="post-item-time">${formatTime(post.createdAt)}</div>
       </div>
@@ -34,6 +35,7 @@ function createPostCard(post) {
 function renderPostCards(posts, containerId, onClickCallback) {
   const container = document.getElementById(containerId);
   
+  // posts가 null로 넘어오면
   if (!posts || posts.length === 0) {
     container.innerHTML = `
       <div class="empty-state">
@@ -54,7 +56,7 @@ function renderPostCards(posts, containerId, onClickCallback) {
         onClickCallback(postId);
       } else {
         // 기본 동작: 상세 페이지로 이동
-        window.location.href = `/pages/post/detail.html?id=${postId}`;
+        window.location.href = `/pages/postDetails/postDetails.html?id=${postId}`;
       }
     });
   });
