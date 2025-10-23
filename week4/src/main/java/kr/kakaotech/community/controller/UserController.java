@@ -1,5 +1,6 @@
 package kr.kakaotech.community.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import kr.kakaotech.community.dto.ApiResponse;
 import kr.kakaotech.community.dto.request.UserRegisterRequest;
 import kr.kakaotech.community.dto.request.UserUpdateRequest;
@@ -72,5 +73,18 @@ public class UserController {
     @PatchMapping("/users/{userId}/deactivation")
     public void deleteUser(@PathVariable String userId) {
         userService.softDeleteUser(userId);
+    }
+
+    /**
+     * 유저 input 실시간 검증
+     *
+     * 이메일과 닉네임을 실시간으로 검증하여 결과를 반환합니다.
+     */
+    @GetMapping("/users/email")
+    public ResponseEntity<ApiResponse<Boolean>> checkUserEmail(@RequestParam String email, HttpServletRequest request) {
+        String uri = request.getRequestURI();
+        String userInfo = uri.substring(uri.lastIndexOf('/') + 1);
+
+        return ApiResponse.success("duplication 결과", userService.duplicateCheckUserInfo(userInfo, email));
     }
 }

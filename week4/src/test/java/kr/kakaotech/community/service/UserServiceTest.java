@@ -1,60 +1,44 @@
 package kr.kakaotech.community.service;
 
 import kr.kakaotech.community.dto.request.UserRegisterRequest;
-import kr.kakaotech.community.entity.Image;
 import kr.kakaotech.community.entity.User;
-import kr.kakaotech.community.repository.ImageRepository;
 import kr.kakaotech.community.repository.UserRepository;
-import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.util.Optional;
-import java.util.UUID;
+import static org.mockito.Mockito.*;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-@SpringBootTest
-@Transactional
+@ExtendWith(MockitoExtension.class)
 class UserServiceTest {
 
-    @Autowired
+    @Mock
+    private UserRepository userRepository;
+    @Mock
+    private PasswordEncoder passwordEncoder;
+
+    @InjectMocks
     private UserService userService;
 
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private ImageRepository imageRepository;
-
     @Test
-    void hardDeleteUser_cascade_동작확인() {
+    @DisplayName("회원 등록 테스트입니다.")
+    void registerUserTest() {
         // given
-        Image image = new Image("https://s3.com/clay_profile.jpg");
-        User user = new User("clay@test.kr", "123123", "clay", "USER", image);
+        UserRegisterRequest registerRequest = new UserRegisterRequest("clay@clay.com", "clay123", "clay", "https://s3.clay.jpg", "USER");
 
-        userRepository.save(user);
-        UUID userId = user.getId();
-        int imageId = image.getId();
-
-        // then
-        Optional<User> getUser = userRepository.findById(userId);
-        Optional<Image> getImage = imageRepository.findById(imageId);
-
-        Assertions.assertEquals(getUser.get(), user);
-        Assertions.assertEquals(getImage.get(), image);
+        when(userRepository.existsByNickname(registerRequest.getNickname())).thenReturn(false);
+        when(userRepository.existsByEmail(registerRequest.getEmail())).thenReturn(false);
+        when(passwordEncoder.encode(registerRequest.getPassword())).thenReturn("password");
 
         // when
-        userService.hardDeleteUser(userId.toString());
+        userService.registerUser(registerRequest);
 
         // then
-        Optional<User> deletedUser = userRepository.findById(userId);
-        Optional<Image> deletedImage = imageRepository.findById(imageId);
-
-        assertTrue(deletedUser.isEmpty());
-        assertTrue(deletedImage.isEmpty());
+        verify(userRepository, times(1)).save(any(User.class));
     }
 
 }

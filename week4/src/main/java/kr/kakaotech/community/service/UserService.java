@@ -146,4 +146,11 @@ public class UserService {
         userRepository.delete(getUser);
     }
 
+    public boolean duplicateCheckUserInfo(String info, String userInput) {
+        return switch (info) {
+            case "email" -> userRepository.existsByEmail(userInput);
+            case "nickname" -> userRepository.existsByNickname(userInput);
+            default -> false;
+        };
+    }
 }
