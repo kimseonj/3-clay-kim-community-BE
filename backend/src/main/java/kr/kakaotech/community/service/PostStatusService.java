@@ -107,7 +107,7 @@ public class PostStatusService {
         return new PostStatusResponse(viewCount, likeCount, commentCount);
     }
 
-    @Scheduled(fixedDelay = 60000) // 1분마다
+    @Scheduled(fixedDelay = 6000000) // 1분마다
     public void syncToDatabase() {
         log.info("스케쥴러 시작");
         transactionalSync();

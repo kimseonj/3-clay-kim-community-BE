@@ -27,13 +27,10 @@ public class PostController {
      * 게시글 작성
      */
     @PostMapping("/posts")
-    public ResponseEntity<ApiResponse> registerPost(@RequestBody PostRegisterRequest postRegisterRequest, @AuthenticationPrincipal CustomUserDetails principal) {
+    public ResponseEntity<ApiResponse<Integer>> registerPost(@RequestBody PostRegisterRequest postRegisterRequest, @AuthenticationPrincipal CustomUserDetails principal) {
         String userId = principal.getUserId();
 
-        postService.registerPost(userId, postRegisterRequest);
-
-        ApiResponse apiResponse = new ApiResponse("게시글 등록 성공", null);
-        return ResponseEntity.status(201).body(apiResponse);
+        return ApiResponse.create("게시글 등록 성공", postService.registerPost(userId, postRegisterRequest));
     }
 
     /**
@@ -90,10 +87,11 @@ public class PostController {
      * 게시글 수정
      */
     @PatchMapping("/posts/{postId}")
-    public ResponseEntity<ApiResponse<Object>> registerPost(@PathVariable int postId, @RequestBody PostRegisterRequest postRegisterRequest) {
-        String fakeUserId = fakeUserProvider.getCurrentUserId().toString();
+    public ResponseEntity<ApiResponse<Object>> registerPost(@PathVariable int postId, @AuthenticationPrincipal CustomUserDetails userDetails, @RequestBody PostRegisterRequest postRegisterRequest) {
 
-        postService.updatePost(postId, fakeUserId, postRegisterRequest);
+        String userId = userDetails.getUserId();
+
+        postService.updatePost(postId, userId, postRegisterRequest);
 
         return ApiResponse.success("게시글 수정 성공", null);
     }
@@ -102,10 +100,8 @@ public class PostController {
      * 게시글 삭제
      */
     @PatchMapping("/posts/{postId}/deactivation")
-    public ResponseEntity<ApiResponse<Object>> deactivatePost(@PathVariable int postId) {
-        String fakeUserId = fakeUserProvider.getCurrentUserId().toString();
-
-        postService.deletePost(postId, fakeUserId);
+    public ResponseEntity<ApiResponse<Object>> deactivatePost(@PathVariable int postId, @AuthenticationPrincipal CustomUserDetails userDetails) {
+        postService.deletePost(postId, userDetails.getUserId());
 
         return ApiResponse.success("삭제 성공", null);
     }

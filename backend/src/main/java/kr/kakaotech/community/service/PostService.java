@@ -31,7 +31,7 @@ public class PostService {
      * Post 등록
      */
     @Transactional
-    public void registerPost(String userId, PostRegisterRequest request) {
+    public int registerPost(String userId, PostRegisterRequest request) {
         User getUser = userRepository.findById(UUID.fromString(userId)).orElseThrow(() ->
                 new CustomException(ErrorCode.NOT_FOUND_USER));
 
@@ -52,6 +52,8 @@ public class PostService {
         System.out.println("=== postId: " + savedPost.getId());  // 여기서 2 찍히는지 확인
         PostStatus status = new PostStatus(savedPost);
         postStatusRepository.save(status);
+
+        return savedPost.getId();
     }
 
     /**
@@ -80,31 +82,32 @@ public class PostService {
         post.updatePost(request);
     }
 
-//    /**
-//     * 게시글 목록 조회
-//     */
-//    @Transactional
-//    public PostListResponse getPostList(Integer cursor, int size) {
-//        Pageable pageable = PageRequest.of(0, size);
-//        List<Object[]> resultList;
-//
-//        if (cursor == null) {
-////            posts = postRepository.findTopPost(size);
-//            resultList = postRepository.findTopPost(pageable);
-//        } else {
-////            posts = postRepository.findPostByCursor(cursor, size);
-//            resultList = postRepository.findPostByCursor(cursor, pageable);
-//        }
-//
-//        boolean hasNext = resultList.size() == size;
+    /**
+     * 게시글 목록 조회
+     * size 사용
+     */
+    @Transactional
+    public PostListResponse getPostListBySize(Integer cursor, int size) {
+        Pageable pageable = PageRequest.of(0, size);
+        List<Object[]> resultList;
+
+        if (cursor == null) {
+//            posts = postRepository.findTopPost(size);
+            resultList = postRepository.findTopPost(pageable);
+        } else {
+//            posts = postRepository.findPostByCursor(cursor, size);
+            resultList = postRepository.findPostByCursor(cursor, pageable);
+        }
+
+        boolean hasNext = resultList.size() == size;
 //        Integer nextCursor = hasNext ? resultList.get(resultList.size() - 1).getId() : null;
-//
+
 //        List<PostSummaryResponse> postList = resultList.stream()
 //                .map(PostSummaryResponse::fromEntity)
 //                .toList();
-//
-//        return new PostListResponse(postList, nextCursor, hasNext);
-//    }
+
+        return new PostListResponse(null, null, hasNext);
+    }
 
     /**
      * 게시글 목록 조회
@@ -147,11 +150,14 @@ public class PostService {
             throw new CustomException(ErrorCode.NOT_FOUND_POST);
         }
 
+        post.getUser().getId();
+
         return new PostDetailResponse(
                 post.getTitle(),
                 post.getContent(),
-                post.getNickname(),
-                post.getCreatedAt()
+                post.getCreatedAt(),
+                post.getUser().getId().toString(),
+                post.getNickname()
         );
     }
 

@@ -22,8 +22,12 @@ spring:
       port: 6379
       password:
 
+  thymeleaf:
+    cache: true
+
 jwt:
   expirationtime:
+#    accessTime: 216000
     accessTime: 21600000
     refreshTime: 21600000
   secret: ${JWT_SECRET:defaultfordevalsjfielsjfinaajfowinblxiejfwoihbya}
@@ -32,3 +36,4 @@ jwt:
 logging:
   level:
     org.hibernate.SQL: debug
+

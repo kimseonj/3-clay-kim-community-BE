@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 public class PostDetailResponse {
     private String title;
     private String content;
-    private String nickname;
     private LocalDateTime createdAt;
+    private String userId;
+    private String nickname;
 }

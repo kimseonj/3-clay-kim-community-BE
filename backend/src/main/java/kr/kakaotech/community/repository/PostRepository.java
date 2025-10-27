@@ -25,6 +25,7 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
         SELECT p, ps
         FROM posts p
         JOIN FETCH post_statuses ps ON ps.post = p
+        WHERE p.deleted = false
         ORDER BY p.id DESC
     """)
     List<Object[]> findTopPost(Pageable pageable);
@@ -33,7 +34,7 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
     SELECT p, ps
     FROM posts p
     JOIN FETCH post_statuses ps ON ps.post = p
-    WHERE p.id < :cursor
+    WHERE p.id < :cursor AND p.deleted = false
     ORDER BY p.id DESC
     """)
     List<Object[]> findPostByCursor(@Param("cursor") int cursor, Pageable pageable);
