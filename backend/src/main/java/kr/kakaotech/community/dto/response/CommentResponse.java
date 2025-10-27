@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 public class CommentResponse {
     private int id;
     private String content;
+    private String userId;
     private String nickname;
     private LocalDateTime createdAt;
 
@@ -21,12 +22,14 @@ public class CommentResponse {
                     comment.getId(),
                     "삭제된 댓글입니다.",
                     null,
+                    null,
                     comment.getCreatedAt()
             );
         } else {
             response = new CommentResponse(
                     comment.getId(),
                     comment.getContent(),
+                    comment.getUser().getId().toString(),
                     comment.getUser().getNickname(),
                     comment.getCreatedAt()
             );

@@ -15,6 +15,8 @@ public enum ErrorCode {
 
     NOT_FOUND_USER("사용자를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
 
+    BAD_PASSWORD("사용중인 비밀번호를 확인해주세요.", HttpStatus.BAD_REQUEST),
+
     /**
      * Post 에러
      */

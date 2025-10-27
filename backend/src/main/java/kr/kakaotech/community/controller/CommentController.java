@@ -4,6 +4,7 @@ import kr.kakaotech.community.dto.ApiResponse;
 import kr.kakaotech.community.dto.request.CommentRequest;
 import kr.kakaotech.community.dto.response.CommentResponse;
 import kr.kakaotech.community.global.FakeUserProvider;
+import kr.kakaotech.community.global.security.CustomUserDetails;
 import kr.kakaotech.community.service.CommentService;
 import kr.kakaotech.community.service.PostStatusService;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
@@ -25,10 +27,8 @@ public class CommentController {
      * 댓글 등록
      */
     @PostMapping("/posts/{postId}/comments")
-    public ResponseEntity<ApiResponse<Void>> registerComment(@PathVariable int postId, @RequestBody CommentRequest request) {
-        String userId = fakeUserProvider.getCurrentUserId().toString();
-
-        commentService.registerComment(userId, postId, request);
+    public ResponseEntity<ApiResponse<Void>> registerComment(@PathVariable int postId, @RequestBody CommentRequest request, @AuthenticationPrincipal CustomUserDetails userDetails) {
+        commentService.registerComment(userDetails.getUserId(), postId, request);
         postStatusService.incrementCommentCount(postId);
 
         ApiResponse<Void> apiResponse = new ApiResponse<>("댓글 등록 성공", null);
@@ -53,9 +53,8 @@ public class CommentController {
      * 댓글 수정
      */
     @PatchMapping("/comments/{commentId}")
-    public ResponseEntity<ApiResponse<Void>> updateComment(@PathVariable int commentId, @RequestBody CommentRequest request) {
-        String userId = fakeUserProvider.getCurrentUserId().toString();
-        commentService.updateComment(userId, commentId, request);
+    public ResponseEntity<ApiResponse<Void>> updateComment(@PathVariable int commentId, @RequestBody CommentRequest request, @AuthenticationPrincipal CustomUserDetails userDetails) {
+        commentService.updateComment(userDetails.getUserId(), commentId, request);
 
         ApiResponse<Void> apiResponse = new ApiResponse<>("댓글 수정 성공", null);
         return ResponseEntity.ok(apiResponse);
@@ -65,9 +64,8 @@ public class CommentController {
      * 댓글 삭제
      */
     @PatchMapping("/comments/{commentId}/deactivation")
-    public ResponseEntity<ApiResponse<Void>> deleteComment(@PathVariable int commentId) {
-        String userId = fakeUserProvider.getCurrentUserId().toString();
-        commentService.deleteComment(userId, commentId);
+    public ResponseEntity<ApiResponse<Void>> deleteComment(@PathVariable int commentId, @AuthenticationPrincipal CustomUserDetails userDetails) {
+        commentService.deleteComment(userDetails.getUserId(), commentId);
 
         ApiResponse<Void> apiResponse = new ApiResponse<>("댓글 삭제 성공", null);
         return ResponseEntity.ok(apiResponse);
