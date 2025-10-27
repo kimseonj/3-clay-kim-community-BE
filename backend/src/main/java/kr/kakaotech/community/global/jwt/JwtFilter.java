@@ -5,19 +5,20 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import kr.kakaotech.community.dto.ApiResponse;
 import kr.kakaotech.community.entity.User;
 import kr.kakaotech.community.entity.UserRole;
-import kr.kakaotech.community.exception.CustomException;
-import kr.kakaotech.community.exception.ErrorCode;
 import kr.kakaotech.community.global.security.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.UUID;
 
 @Slf4j
@@ -45,7 +46,15 @@ public class JwtFilter extends OncePerRequestFilter {
         try {
             jwtUtil.isExpired(accessToken);
         } catch (ExpiredJwtException e) {
-            throw new CustomException(ErrorCode.EXPIRED_JWT);
+            log.error("[JwtFilter] JWT access 토큰이 만료되었습니다.", e);
+            ApiResponse<Object> accessTokenExpired = new ApiResponse<>("accessToken expired", null);
+
+            PrintWriter writer = response.getWriter();
+            writer.print(accessTokenExpired.toString());
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+
+            // 바로 종료
+            return;
         }
 
         // 토큰에서 email 과 role 획득

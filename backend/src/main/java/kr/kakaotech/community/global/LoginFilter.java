@@ -70,6 +70,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
         String userId = principal.getUserId();
         String email = principal.getUsername();
+        String nickname = principal.getNickname();
 
         Collection<? extends GrantedAuthority> authorities = authResult.getAuthorities();
         Iterator<? extends GrantedAuthority> iterator = authorities.iterator();
@@ -90,7 +91,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 //        response.addCookie(cookieUtil.createCookie("refresh", refreshToken));
         response.setStatus(HttpStatus.OK.value());
 
-        UserLoginResponse userLoginResponse = new UserLoginResponse(accessToken);
+        UserLoginResponse userLoginResponse = new UserLoginResponse(accessToken, nickname, userId);
         ApiResponse<UserLoginResponse> apiResponse = new ApiResponse<>("로그인 성공", userLoginResponse);
 
         objectMapper.writeValue(response.getWriter(), apiResponse);
@@ -99,6 +100,13 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
         log.info("Fail: LoginFilter unsuccessfulAuthentication Exception : ", failed);
-        throw new CustomException(ErrorCode.LOGIN_FAIL);
+//        throw new CustomException(ErrorCode.LOGIN_FAIL);
+
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        response.setStatus(HttpStatus.UNAUTHORIZED.value());
+
+        ApiResponse<Void> apiResponse = new ApiResponse<>("로그인 실패: 이메일 또는 비밀번호를 확인해주세요", null);
+        objectMapper.writeValue(response.getWriter(), apiResponse);
     }
 }
