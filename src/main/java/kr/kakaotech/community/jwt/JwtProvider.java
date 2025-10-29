@@ -14,15 +14,13 @@ import java.util.UUID;
 @Component
 public class JwtProvider {
     private final SecretKey secretKey;
-    private final int accessTtlSec;
-    private final int refreshTtlSec;
+    @Value("${jwt.expirationtime.accessTime}")
+    private int accessTtlSec;
+    @Value("${jwt.expirationtime.refreshTime}")
+    private int refreshTtlSec;
 
-    public JwtProvider(@Value("${jwt.secret}") String secretKey,
-                       @Value("${jwt.expirationtime.accessTime}") int accessTtlSec,
-                       @Value("${jwt.expirationtime.refreshTime}") int refreshTtlSec) {
+    public JwtProvider(@Value("${jwt.secret}") String secretKey) {
         this.secretKey = new SecretKeySpec(secretKey.getBytes(StandardCharsets.UTF_8), Jwts.SIG.HS256.key().build().getAlgorithm());
-        this.accessTtlSec = accessTtlSec;
-        this.refreshTtlSec = refreshTtlSec;
     }
 
     // 검증
