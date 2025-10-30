@@ -38,6 +38,7 @@ public enum ErrorCode {
      * JWT
      */
     EXPIRED_JWT("JWT 기간 만료되었습니다.", HttpStatus.UNAUTHORIZED),
+    NON_SIGNATURE_JWT("올바르지않은 서명입니다.", HttpStatus.UNAUTHORIZED),
 
     /**
      * 이미지 에러

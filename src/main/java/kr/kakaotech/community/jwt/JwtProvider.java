@@ -9,14 +9,13 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
-import java.util.UUID;
 
 @Component
 public class JwtProvider {
     private final SecretKey secretKey;
-    @Value("${jwt.expirationtime.accessTime}")
+    @Value("${jwt.expirationtime.accessTtl}")
     private int accessTtlSec;
-    @Value("${jwt.expirationtime.refreshTime}")
+    @Value("${jwt.expirationtime.refreshTtl}")
     private int refreshTtlSec;
 
     public JwtProvider(@Value("${jwt.secret}") String secretKey) {
@@ -44,7 +43,7 @@ public class JwtProvider {
     }
 
     // 생성
-    private String createAccess(String userId, String role) {
+    public String createAccess(String userId, String role) {
         return Jwts.builder()
                 .subject(userId)
                 .claim("role", role)
@@ -54,14 +53,13 @@ public class JwtProvider {
                 .compact();
     }
 
-    private String createRefresh(String userId, String role) {
+    public String createRefresh(String userId, String role) {
         return Jwts.builder()
                 .subject(userId)
                 .claim("role", role)
                 .claim("typ", "refresh")
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + refreshTtlSec))
-                .id(UUID.randomUUID().toString())
                 .signWith(secretKey)
                 .compact();
     }
