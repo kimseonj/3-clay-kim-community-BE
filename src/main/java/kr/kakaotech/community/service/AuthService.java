@@ -33,8 +33,9 @@ public class AuthService {
     private final String REFRESH_TOKEN_PREFIX = "refresh_token:";
 
     public UserLoginResponse getToken(String email, String password, HttpServletResponse response) {
-        User user = userRepository.findByEmail(email).orElseThrow(() ->
-                new CustomException(ErrorCode.NOT_FOUND_USER));
+        User user = userRepository.findByEmail(email).get();
+//                .orElseThrow(() ->
+//                new CustomException(ErrorCode.NOT_FOUND_USER));
 
         if (!checkPassword(password, user)) {
             throw new CustomException(ErrorCode.BAD_PASSWORD);
