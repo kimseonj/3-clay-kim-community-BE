@@ -2,7 +2,7 @@ package kr.kakaotech.community.service;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
-import kr.kakaotech.community.dto.request.UserLoginResponse;
+import kr.kakaotech.community.dto.response.UserLoginResponse;
 import kr.kakaotech.community.entity.User;
 import kr.kakaotech.community.exception.CustomException;
 import kr.kakaotech.community.exception.ErrorCode;
@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.concurrent.TimeUnit;
 
@@ -32,10 +33,10 @@ public class AuthService {
 
     private final String REFRESH_TOKEN_PREFIX = "refresh_token:";
 
+    @Transactional
     public UserLoginResponse getToken(String email, String password, HttpServletResponse response) {
-        User user = userRepository.findByEmail(email).get();
-//                .orElseThrow(() ->
-//                new CustomException(ErrorCode.NOT_FOUND_USER));
+        User user = userRepository.findByEmail(email).orElseThrow(() ->
+                new CustomException(ErrorCode.NOT_FOUND_USER));
 
         if (!checkPassword(password, user)) {
             throw new CustomException(ErrorCode.BAD_PASSWORD);
@@ -51,7 +52,7 @@ public class AuthService {
         addTokenCookie(response, "accessToken", tokenResponse.accessToken, accessTtl);
         addTokenCookie(response, "refreshToken", tokenResponse.refreshToken, refreshTtl);
 
-        return new UserLoginResponse(user.getNickname(), user.getEmail());
+        return new UserLoginResponse(user.getNickname(), user.getEmail(), user.getId().toString());
     }
 
     private boolean checkPassword(String password, User user) {

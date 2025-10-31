@@ -1,10 +1,9 @@
 package kr.kakaotech.community.controller;
 
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import kr.kakaotech.community.dto.ApiResponse;
 import kr.kakaotech.community.dto.request.UserLoginRequest;
-import kr.kakaotech.community.dto.request.UserLoginResponse;
+import kr.kakaotech.community.dto.response.UserLoginResponse;
 import kr.kakaotech.community.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
