@@ -1,6 +1,8 @@
 package kr.kakaotech.community.service;
 
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import kr.kakaotech.community.dto.response.UserLoginResponse;
 import kr.kakaotech.community.entity.User;
@@ -15,6 +17,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 @RequiredArgsConstructor
@@ -31,6 +36,8 @@ public class AuthService {
     @Value("${jwt.expirationtime.refreshTtl}")
     private int refreshTtl;
 
+    private final String ACCESS_TOKEN = "accessToken";
+    private final String REFRESH_TOKEN = "refreshToken";
     private final String REFRESH_TOKEN_PREFIX = "refresh_token:";
 
     @Transactional
@@ -45,14 +52,76 @@ public class AuthService {
         // 기존 리프레시 토큰 무효화
         redisTemplate.delete(REFRESH_TOKEN_PREFIX + user.getId().toString());
 
-        // 토큰 발급
+        // 토큰 발급 및 저장
         TokenResponse tokenResponse = generateAndSaveToken(user);
-
-        // 토큰 쿠키로 저장
-        addTokenCookie(response, "accessToken", tokenResponse.accessToken, accessTtl);
-        addTokenCookie(response, "refreshToken", tokenResponse.refreshToken, refreshTtl);
+        setCookie(response, tokenResponse);
 
         return new UserLoginResponse(user.getNickname(), user.getEmail(), user.getId().toString());
+    }
+
+    /**
+     * 로그아웃
+     *
+     * 쿠키 maxAge 0으로 설정
+     * redis 삭제
+     */
+    public void deleteToken(HttpServletRequest request, HttpServletResponse response) {
+        addTokenCookie(response, ACCESS_TOKEN, null, 0);
+        addTokenCookie(response, REFRESH_TOKEN, null, 0);
+
+        String refreshToken = extractedRefreshToken(request);
+
+        // RefreshToken 검증 및 만료확인
+        Claims refreshClaims = jwtProvider.parseToken(refreshToken);
+        String userId = refreshClaims.getSubject();
+
+        redisTemplate.delete(REFRESH_TOKEN_PREFIX + userId);
+    }
+
+    /**
+     * ACCESS_TOKEN 갱신
+     *
+     * refreshToken 만료확인
+     * redis에 있는지 확인
+     * ACCESS_TOKEN & refreshToken 발급
+     * Cookie 생성
+     */
+    @Transactional
+    public void refreshToken(HttpServletRequest request, HttpServletResponse response) {
+        // 쿠키 확인
+        String refreshToken = extractedRefreshToken(request);
+
+        // RefreshToken 검증 및 만료확인
+        Claims refreshClaims = jwtProvider.parseToken(refreshToken);
+        String userId = refreshClaims.getSubject();
+
+        // redis 검증
+        String refreshTokenFromRedis = getRefreshTokenFromRedis(userId);
+        if (refreshTokenFromRedis == null || !refreshTokenFromRedis.equals(refreshToken)) {
+            throw new CustomException(ErrorCode.INVALID_TOKEN);
+        }
+
+        // 쿠키 재발급(Access + Refresh, Refresh Redis 등록)
+        User user = userRepository.findById(UUID.fromString(userId)).get();
+        setCookie(response, generateAndSaveToken(user));
+    }
+
+    private String extractedRefreshToken(HttpServletRequest request) {
+        return Optional.ofNullable(request.getCookies()).stream()
+                .flatMap(Arrays::stream)
+                .filter(cookie -> REFRESH_TOKEN.equals(cookie.getName()))
+                .map(Cookie::getValue)
+                .findFirst().orElseThrow(() ->
+                        new CustomException(ErrorCode.INVALID_TOKEN));
+    }
+
+    private String getRefreshTokenFromRedis(String userId) {
+        return (String) redisTemplate.opsForValue().get(REFRESH_TOKEN_PREFIX + userId);
+    }
+
+    private void setCookie(HttpServletResponse response, TokenResponse tokenResponse) {
+        addTokenCookie(response, ACCESS_TOKEN, tokenResponse.accessToken, accessTtl);
+        addTokenCookie(response, REFRESH_TOKEN, tokenResponse.refreshToken, refreshTtl);
     }
 
     private boolean checkPassword(String password, User user) {
@@ -74,6 +143,7 @@ public class AuthService {
         cookie.setMaxAge(maxAge);
         cookie.setPath("/");
         cookie.setHttpOnly(true);
+        cookie.setSecure(false);
 
         response.addCookie(cookie);
     }
