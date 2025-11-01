@@ -61,7 +61,9 @@ public class UserController {
      * 회원 정보 업데이트
      */
     @PatchMapping("/users/{userId}")
-    public ResponseEntity<ApiResponse<UserDetailResponse>> updateUser(@PathVariable String userId, @RequestBody UserUpdateRequest userUpdateRequest) {
+    public ResponseEntity<ApiResponse<UserDetailResponse>> updateUser(@PathVariable String userId,
+                                                                      @ModelAttribute UserUpdateRequest userUpdateRequest,
+                                                                      HttpServletRequest request) {
         UserDetailResponse userDetailResponse = userService.updateUser(userId, userUpdateRequest);
 
         ApiResponse<UserDetailResponse> apiResponse = new ApiResponse<>("업데이트 성공", userDetailResponse);
