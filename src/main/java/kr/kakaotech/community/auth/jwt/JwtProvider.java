@@ -1,4 +1,4 @@
-package kr.kakaotech.community.jwt;
+package kr.kakaotech.community.auth.jwt;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

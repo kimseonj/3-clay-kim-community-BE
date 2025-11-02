@@ -42,6 +42,11 @@ public enum ErrorCode {
     INVALID_TOKEN("토큰이 존재하지 않습니다.", HttpStatus.UNAUTHORIZED),
 
     /**
+     * Session
+     */
+    INVALID_SESSION("세션이 존재하지 않습니다.", HttpStatus.UNAUTHORIZED),
+
+    /**
      * 이미지 에러
      */
     NOT_FOUND_IMAGE("이미지를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
