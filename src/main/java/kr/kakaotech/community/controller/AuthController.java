@@ -23,14 +23,14 @@ public class AuthController {
 
     @PostMapping("/auth")
     public ResponseEntity<ApiResponse<UserLoginResponse>> getTokenByLogin(@RequestBody UserLoginRequest userLoginRequest, HttpServletResponse response) {
-        UserLoginResponse userLoginResponse = authService.getToken(userLoginRequest.getEmail(), userLoginRequest.getPassword(), response);
+        UserLoginResponse userLoginResponse = authService.getAuth(userLoginRequest, response);
         log.info(response.toString());
         return ApiResponse.success("로그인 성공", userLoginResponse);
     }
 
     @PostMapping("/auth/token")
     public ResponseEntity<ApiResponse<Object>> getToken(HttpServletRequest request, HttpServletResponse response) {
-        authService.deleteToken(request, response);
+        authService.deleteAuth(request, response);
         return ApiResponse.success("로그아웃 성공", null);
     }
 
