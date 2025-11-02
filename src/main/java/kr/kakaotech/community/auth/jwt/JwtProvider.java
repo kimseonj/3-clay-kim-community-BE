@@ -27,21 +27,6 @@ public class JwtProvider {
     public Claims parseToken(String token) {
         return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload();
     }
-    public String getUserId(Claims claims) {
-        return claims.getSubject();
-    }
-    public String getEmail(Claims claims) {
-        return claims.get("email", String.class);
-    }
-    public String getRole(Claims claims) {
-        return claims.get("role", String.class);
-    }
-    public boolean isExpired(Claims claims) {
-        return claims.getExpiration().before(new Date());
-    }
-    public boolean isRefresh(Claims claims) {
-        return claims.get("type").equals("refresh");
-    }
 
     // 생성
     public String createAccess(String userId, String role) {

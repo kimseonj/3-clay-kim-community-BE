@@ -7,12 +7,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import kr.kakaotech.community.auth.AuthenticationStrategy;
 import kr.kakaotech.community.exception.CustomException;
 import kr.kakaotech.community.exception.ErrorCode;
-import kr.kakaotech.community.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
@@ -26,8 +24,6 @@ import java.util.concurrent.TimeUnit;
 public class SessionFilter implements AuthenticationStrategy {
 
     private final RedisTemplate<String, Object> redisTemplate;
-    private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
 
     private final String Session_Cookie_Name = "JSESSIONID";
     private final String SESSION_PREFIX = "sessionKey:";
@@ -79,21 +75,4 @@ public class SessionFilter implements AuthenticationStrategy {
         request.setAttribute("userId", sessionDao.getUserId());
         request.setAttribute("role", sessionDao.getRole());
     }
-
-    public void login(HttpServletRequest request) {
-//        try {
-//            // getInputStream()으로 body의 json 읽기
-//            UserLoginRequest userLoginRequest = new ObjectMapper().readValue(request.getInputStream(), UserLoginRequest.class);
-//
-//            User user = userRepository.findByEmail(userLoginRequest.getEmail()).orElseThrow(() ->
-//                    new CustomException(ErrorCode.NOT_FOUND_USER));
-//
-//            if (!checkPassword(userLoginRequest.getPassword(), user)) {
-//                throw new CustomException(ErrorCode.BAD_PASSWORD);
-//            }
-//        } catch (IOException e) {
-//            throw new CustomException(ErrorCode.NOT_FOUND_USER);
-//        }
-    }
-
 }

@@ -21,6 +21,11 @@ public class AuthController {
 
     private final AuthService authService;
 
+    /**
+     * 로그인
+     *
+     * 쿠키 설정 및 DB 저장
+     */
     @PostMapping("/auth")
     public ResponseEntity<ApiResponse<UserLoginResponse>> getTokenByLogin(@RequestBody UserLoginRequest userLoginRequest, HttpServletResponse response) {
         UserLoginResponse userLoginResponse = authService.getAuth(userLoginRequest, response);
@@ -28,6 +33,11 @@ public class AuthController {
         return ApiResponse.success("로그인 성공", userLoginResponse);
     }
 
+    /**
+     * 로그아웃
+     *
+     * 쿠키 삭제 및 DB 삭제
+     */
     @PostMapping("/auth/token")
     public ResponseEntity<ApiResponse<Object>> getToken(HttpServletRequest request, HttpServletResponse response) {
         authService.deleteAuth(request, response);

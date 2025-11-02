@@ -31,7 +31,6 @@ public class JwtFilter implements AuthenticationStrategy {
      * JWT 추출(헤더, 쿠키)
      *
      */
-    // 토큰 추출
     @Override
     public Optional<String> extractAuth(HttpServletRequest request) {
         return extractTokenFromCookie(request, ACCESS_TOKEN)
