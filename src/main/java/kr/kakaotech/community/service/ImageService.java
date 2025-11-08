@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
+import java.util.Random;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -65,6 +66,12 @@ public class ImageService {
         if (image.getSize() > 10 * 1024 * 1024) {
             throw new IllegalArgumentException("파일 크기는 10MB 이하만 가능합니다.");
         }
+    }
+
+    public Image getDefaultImage() {
+        Random random = new Random();
+        int randomId = random.nextInt(8) + 1;
+        return imageRepository.findById(randomId).get();
     }
 
 }
