@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
+import java.util.Random;
+
 @Slf4j
 @RequiredArgsConstructor
 @Service
@@ -67,4 +69,9 @@ public class ImageService {
         }
     }
 
+    public Image getDefaultImage() {
+        Random random = new Random();
+        int randomId = random.nextInt(8) + 1;
+        return imageRepository.findById(randomId).get();
+    }
 }
