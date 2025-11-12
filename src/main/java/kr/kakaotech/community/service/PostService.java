@@ -106,6 +106,18 @@ public class PostService {
     }
 
     /**
+     * nickname에 따른 검색
+     */
+    public PostListResponse getNicknamePostList(Integer cursor, String nickname, int size) {
+        List<PostSummaryResponse> postList = postRepository.findPostByNickname(
+                nickname,
+                PageRequest.of(cursor == null ? 0 : cursor, size)
+        );
+
+        return getPostListAndNextCursorResponse(size, postList);
+    }
+
+    /**
      * TOP 10 좋아요 순서 정렬
      */
     public PostListResponse getPostTop10List() {
@@ -125,8 +137,6 @@ public class PostService {
         if (post.getDeleted()) {
             throw new CustomException(ErrorCode.NOT_FOUND_POST);
         }
-
-        postStatusRepository.incrementViewCount(postId);
 
         return new PostDetailResponse(
                 post.getTitle(),
