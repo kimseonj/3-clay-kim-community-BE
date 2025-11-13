@@ -44,7 +44,7 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
                 join post_statuses ps on ps.post = p
                 where p.deleted = false
                 and p.createdAt >= :startDate
-                order by ps.likeCount asc
+                order by ps.likeCount desc
             """)
     List<PostSummaryResponse> findPostByLikeCount(@Param("startDate") LocalDateTime startDate, Pageable pageable);
 
@@ -56,10 +56,9 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
                 from posts p
                 join post_statuses ps on ps.post = p
                 where p.deleted = false
-                order by ps.likeCount asc
+                order by ps.likeCount desc
             """)
-    List<PostSummaryResponse> findTop10Post(
-            Pageable pageable);
+    List<PostSummaryResponse> findTop10Post(Pageable pageable);
 
     @Query("""
                 SELECT new kr.kakaotech.community.dto.response.PostSummaryResponse(
