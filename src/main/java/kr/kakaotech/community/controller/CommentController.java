@@ -26,7 +26,6 @@ public class CommentController {
     @PostMapping("/posts/{postId}/comments")
     public ResponseEntity<ApiResponse<Void>> registerComment(@PathVariable int postId, @RequestBody CommentRequest request, HttpServletRequest httpServletRequest) {
         commentService.registerComment(httpServletRequest.getAttribute("userId").toString(), postId, request);
-        postStatusService.incrementCommentCount(postId);
 
         ApiResponse<Void> apiResponse = new ApiResponse<>("댓글 등록 성공", null);
         return ResponseEntity.status(201).body(apiResponse);
