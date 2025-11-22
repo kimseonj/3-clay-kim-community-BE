@@ -108,8 +108,6 @@ public class PostController {
      */
     @PostMapping("/post-status")
     public ResponseEntity<ApiResponse<Object>> syncPostStatus() {
-        postStatusService.syncToDatabase();
-
         return ApiResponse.success("싱크 성공", null);
     }
 }
