@@ -18,8 +18,9 @@ public class PostSummaryResponse {
     private int likeCount;
     private int commentCount;
     private int viewCount;
+    private String imageUrl;
 
-    private static PostSummaryResponse fromEntity(Post post, PostStatus postStatus) {
+    private static PostSummaryResponse fromEntity(Post post, PostStatus postStatus, String userImageUrl) {
         return new PostSummaryResponse(
                 post.getId(),
                 post.getTitle(),
@@ -27,16 +28,17 @@ public class PostSummaryResponse {
                 post.getCreatedAt(),
                 postStatus.getViewCount(),
                 postStatus.getLikeCount(),
-                postStatus.getCommentCount()
+                postStatus.getCommentCount(),
+                userImageUrl
         );
     }
 
-    public static List<PostSummaryResponse> fromJoinedList(List<Object[]> resultList) {
+    public static List<PostSummaryResponse> fromJoinedList(List<Object[]> resultList, String userImageUrl) {
         return resultList.stream()
                 .map(result -> {
                     Post post = (Post) result[0];
                     PostStatus postStatus = (PostStatus) result[1];
-                    return PostSummaryResponse.fromEntity(post, postStatus);
+                    return PostSummaryResponse.fromEntity(post, postStatus, userImageUrl);
                 })
                 .toList();
     }

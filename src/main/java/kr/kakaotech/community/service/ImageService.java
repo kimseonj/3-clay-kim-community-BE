@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.Arrays;
 import java.util.List;
 
 import java.util.Random;
@@ -21,6 +23,7 @@ public class ImageService {
 
     private final ImageManager imageManager;
     private final ImageRepository imageRepository;
+    private final List<String> imageType = Arrays.asList("image/jpg", "image/jpeg", "image/png", "image/gif", "image/webp");
 
     public Image saveImage(MultipartFile image) {
         // 이미지 검증
@@ -60,8 +63,8 @@ public class ImageService {
         if (image.isEmpty()) throw new CustomException(ErrorCode.NOT_FOUND_IMAGE);
 
         String fileContentType = image.getContentType();
-        if (fileContentType.equals("image/jpeg")) {
-            throw new CustomException(ErrorCode.BAD_CONTENT_TYPE);
+        if (imageType.stream().noneMatch(fileContentType::equals)) {
+            throw new CustomException(ErrorCode.IMAGE_BAD_CONTENT_TYPE);
         }
 
         if (image.getSize() > 10 * 1024 * 1024) {
@@ -72,6 +75,7 @@ public class ImageService {
     public Image getDefaultImage() {
         Random random = new Random();
         int randomId = random.nextInt(8) + 1;
-        return imageRepository.findById(randomId).get();
+        String defaultImagePath = "/images/default/default-" + randomId + ".jpg";
+        return new Image(defaultImagePath);
     }
 }

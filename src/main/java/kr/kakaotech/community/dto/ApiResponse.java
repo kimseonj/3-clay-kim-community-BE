@@ -1,6 +1,5 @@
 package kr.kakaotech.community.dto;
 
-import kr.kakaotech.community.dto.response.PostDetailResponse;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.http.ResponseEntity;

@@ -51,7 +51,7 @@ public enum ErrorCode {
      * 이미지 에러
      */
     NOT_FOUND_IMAGE("이미지를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
-    BAD_CONTENT_TYPE("이미지가 아닙니다.", HttpStatus.BAD_REQUEST),
+    IMAGE_BAD_CONTENT_TYPE("이미지 타입 에러", HttpStatus.BAD_REQUEST),
 
     /**
      * 권한 에러
