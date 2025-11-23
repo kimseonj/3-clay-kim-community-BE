@@ -134,17 +134,8 @@ public class PostService {
         Post post = postRepository.findById(postId).orElseThrow(() ->
                 new CustomException(ErrorCode.NOT_FOUND_POST));
 
-        if (post.getDeleted()) {
-            throw new CustomException(ErrorCode.NOT_FOUND_POST);
-        }
-
-        return new PostDetailResponse(
-                post.getTitle(),
-                post.getContent(),
-                post.getCreatedAt(),
-                post.getUser().getId().toString(),
-                post.getNickname()
-        );
+        return postRepository.findPostDetails(postId).orElseThrow(() ->
+                new CustomException(ErrorCode.NOT_FOUND_POST));
     }
 
     /**
