@@ -5,10 +5,9 @@ on:
     branches: [ main ]
 
 jobs:
-  # 1. 배포 전 최소한의 검증 (테스트/빌드)
-  pre-deploy-ci:
+  build-deploy:
     runs-on: ubuntu-latest
-
+    
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -28,12 +27,7 @@ jobs:
 
       - name: Build
         run: ./gradlew build -x test --console=plain
-  
-  build-deploy:
-    needs: pre-deploy-ci
-    runs-on: ubuntu-latest
     
-    steps:
       - name: Checkout
         uses: actions/checkout@v4
 
