@@ -1,27 +1,61 @@
-name: Java Blue/Green CI/CD
+name: Deploy Spring Boot to EC2 via AMI
 
 on:
   push:
-    branches:
-      - main
-      - feat/env
+    branches: [ main ]
 
 jobs:
-  build-and-push:
+  build-deploy:
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
 
-      - name: Set up JDK 21
-        uses: actions/setup-java@v3
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      # 1. AWS 인증
+      - name: Configure AWS
+        uses: aws-actions/configure-aws-credentials@v2
         with:
-          java-version: '21'
-          distribution: 'temurin'
-          cache: 'gradle'
-          
-      - name: Grant execute permission for gradlew
-        run: chmod +x ./gradlew
-        
-      - name: Build with Gradle
-        run: ./gradlew build --console=plain
-        
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      # 2. Docker 로그인
+      - name: Login to ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      # 3. Docker 이미지 빌드 & 푸시
+      - name: Build docker image
+        run: |
+          docker build -t ${{ secrets.ECR_REPOSITORY }} .
+          docker tag ${{ secrets.ECR_REPOSITORY }}:latest \
+            ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:latest
+          docker push ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:latest
+
+      # 4. Packer 설치
+      - name: Install Packer
+        run: |
+          sudo apt-get update && sudo apt-get install -y unzip
+          curl -L -o packer.zip https://releases.hashicorp.com/packer/1.11.0/packer_1.11.0_linux_amd64.zip
+          unzip packer.zip && sudo mv packer /usr/local/bin
+
+      # 5. Packer로 AMI 빌드
+      - name: Build AMI using Packer
+        working-directory: deploy
+        run: |
+          packer validate packer.json
+          packer build -machine-readable packer.json | tee packer.txt
+          AMI_ID=$(grep 'artifact,0,id' packer.txt | cut -d, -f6)
+          echo "AMI_ID=${AMI_ID#*:}" >> $GITHUB_ENV
+
+      # 6. ASG Launch Template 업데이트 → 롤링 배포
+      - name: Update Launch Template
+        run: |
+          aws ec2 create-launch-template-version \
+            --launch-template-name spring-app-template \
+            --source-version 1 \
+            --version-description "deploy-${GITHUB_SHA}" \
+            --launch-template-data "{\"ImageId\":\"$AMI_ID\"}"
+
+          aws autoscaling start-instance-refresh \
+            --auto-scaling-group-name spring-app-asg
