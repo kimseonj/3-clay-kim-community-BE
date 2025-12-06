@@ -2,8 +2,8 @@ FROM eclipse-temurin:21-jre-alpine
 
 WORKDIR /app
 
-COPY ./app/build/libs/community-0.0.1-SNAPSHOT.jar .
+COPY /app/build/libs/*.jar app.jar
 
 EXPOSE 8080
 
-CMD ["java", "-jar", "community-0.0.1-SNAPSHOT.jar", "--spring.profiles.active=docker"]
+CMD ["java", "-jar", "app.jar", "--spring.profiles.active=prod"]
