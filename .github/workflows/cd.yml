@@ -27,9 +27,6 @@ jobs:
 
       - name: Build
         run: ./gradlew build -x test --console=plain
-    
-      - name: Checkout
-        uses: actions/checkout@v4
 
       # 1. AWS 인증
       - name: Configure AWS
